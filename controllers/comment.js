@@ -1,5 +1,5 @@
 import { Image } from "../models/image.js";
-import { Comment } from "../models/post.js";
+import { Comment, Post } from "../models/post.js";
 
 export const getComment = async (req, res) => {
     const idPost = req.params.idPost
@@ -13,14 +13,22 @@ export const getComment = async (req, res) => {
 };
 
 export const saveComment = async (req, res) => {
+  const { idPost } = req.body
 
     try {
+      const post = await Post.findById( idPost )
+      
       const comment = new Comment( req.body )
 
       await comment.save();
+
+      post.comments.push(comment)
+      await post.save()
+
       res.status(201).json({ message: 'Comentario guardada con éxito', comment });
     } catch (error) {
       res.status(500).json({ message: 'Error al subir comentario', error });
+      throw error
     }
   }
 

@@ -3,7 +3,7 @@ import { User } from "../models/user.js";
 
 export const getUsers = async (req, res) => {
     try {
-        const users = await User.find()
+        const users = await User.find().populate('profileImage')
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener usuarios' });
@@ -14,7 +14,7 @@ export const getUser = async (req, res) => {
     const id = req.params.id
 
     try {
-        const user = await User.findById(id)
+        const user = await User.findById(id).populate('profileImage')
         res.json(user);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener usuario' });
@@ -25,9 +25,8 @@ export const login = async (req, res) => {
     const { email, password } = req.body
     console.log( req.body );
     
-
     try {
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email }).populate('profileImage')
 
         if (user) {
             if (user.password != password) {

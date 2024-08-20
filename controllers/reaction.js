@@ -1,8 +1,8 @@
-import { Reaction } from "../models/post.js";
+import { Post, Reaction } from "../models/post.js";
 
 
 export const getReaction = async (req, res) => {
-  const idPost = req.params.idPost
+    const { idPost } = req.body
 
   try {
       const reaction = await Reaction.find({ idPost })
@@ -13,12 +13,26 @@ export const getReaction = async (req, res) => {
 };
 
 export const saveReaction = async (req, res) => {
+  const { idPost, author } = req.body
 
   try {
-    const reaction = new Reaction( req.body )
+    const post = await Post.findById( idPost )
 
-    await reaction.save();
-    res.status(201).json({ message: 'Reaccion guardada con éxito', reaction });
+    const previousReaction = await Reaction.findOneAndDelete({ idPost, author })
+
+    if ( previousReaction ) {
+      res.status(201).json({ message: 'Reaccion borrada con éxito', previousReaction });
+    } else {
+      const reaction = new Reaction( req.body )
+  
+      await reaction.save();
+  
+      post.reactions.push(reaction)
+      await post.save()
+  
+      res.status(201).json({ message: 'Reaccion guardada con éxito', reaction });
+    }
+
   } catch (error) {
     res.status(500).json({ message: 'Error al guardar reaccion', error });
   }

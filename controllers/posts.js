@@ -3,7 +3,7 @@ import { Image } from "../models/image.js";
 
 export const getPosts = async (req, res) => {
     try {
-        const posts = await Post.find()
+        const posts = await Post.find().populate(['author', 'comments', 'reactions', 'images'])
         res.json(posts);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener posts' });

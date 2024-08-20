@@ -1,4 +1,6 @@
-import { Image } from "../models/image.js";
+import { Image, ProfileImage } from "../models/image.js";
+import { Post } from "../models/post.js";
+import { User } from "../models/user.js";
 
 export const getImage = async (req, res) => {
     const id = req.params.id
@@ -12,73 +14,50 @@ export const getImage = async (req, res) => {
 };
 
 export const uploadImage = async (req, res) => {
-    const id = req.params.id;
+  const { idPost } = req.params
 
     try {
+      const post = await Post.findById( idPost )
+
       const image = new Image({
         filename: req.file.filename,
         path: req.file.path,
         originalName: req.file.originalname,
-        id: id
+        idPost
       })
 
       await image.save();
+
+      post.images.push(image)
+      await post.save()
+
       res.status(201).json({ message: 'Imagen subida y guardada con éxito', image });
     } catch (error) {
       res.status(500).json({ message: 'Error al subir la imagen', error });
+      throw error
     }
   }
 
-// export const login = async (req, res) => {
-//     const { email, password } = req.body
-//     console.log( req.body );
-    
+  export const uploadProfileImage = async (req, res) => {
+  const { idUser } = req.params
 
-//     try {
-//         const user = await User.findOne({ email })
+    try {
+      const user = await User.findById( idUser )
 
-//         if (user) {
-//             if (user.password != password) {
-//                 res.json({ message: 'Usuario o contraseña incorrecta' });
-//             } else {
-//                 res.json(user);
-//             }
-//         } else {
-//             res.json({ message: 'Usuario o contraseña incorrecta' });
-//         }
+      const image = new ProfileImage({
+        filename: req.file.filename,
+        path: req.file.path,
+        originalName: req.file.originalname,
+      })
 
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error al iniciar sesion' });
-//     }
-// };
+      await image.save();
 
-// export const saveUser = async (req, res) => {
-//     try {
-//         const newUser = new User(req.body);
-//         await newUser.save();
-//         res.status(201).json(newUser);
-//     } catch (error) {
-//         res.status(400).json({ message: 'Error al crear usuario' });
-//     }
-// }
+      user.profileImage = image
+      await user.save()
 
-// export const uploadUser = async (req, res) => {
-//     const id = req.params.id;
-
-//     try {
-//         const image = new Image({
-//             filename: req.file.filename,
-//             path: req.file.path,
-//             originalName: req.file.originalname,
-//             id: id
-//         })
-
-//         await image.save();
-//         res.status(201).json({ message: 'Imagen subida y guardada con éxito', image });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error al subir la imagen', error });
-//     }
-// }
-
-
-
+      res.status(201).json({ message: 'Imagen subida y guardada con éxito', image });
+    } catch (error) {
+      res.status(500).json({ message: 'Error al subir la imagen', error });
+      throw error
+    }
+  }

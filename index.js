@@ -6,7 +6,7 @@ import connectDB from "./config/db.js";
 import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { cors } from "cors";
+import cors from "cors";
 
 // __filename
 const __filename = fileURLToPath(import.meta.url);
