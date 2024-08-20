@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { cors } from "cors";
 
 // __filename
 const __filename = fileURLToPath(import.meta.url);
@@ -19,6 +20,7 @@ const PORT = 3000
 await connectDB()
 // Middleware para parsear JSON
 app.use(express.json());
+app.use( cors() )
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/', postsRoutes)
